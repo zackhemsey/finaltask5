@@ -115,23 +115,14 @@ func parseDuration(s string) (time.Duration, error) {
 }
 
 func (ds DaySteps) ActionInfo() (string, error) {
-	if ds.Steps <= 0 {
-		return "", fmt.Errorf("количество шагов должно быть положительным числом")
-	}
-	if ds.Duration <= 0 {
-		return "", fmt.Errorf("продолжительность должна быть положительной")
-	}
-	if ds.Personal.Weight <= 0 {
-		return "", fmt.Errorf("вес должен быть положительным числом")
-	}
-	if ds.Personal.Height <= 0 {
-		return "", fmt.Errorf("рост должен быть положительным числом")
-	}
+
 	distance := spentenergy.Distance(ds.Steps, ds.Personal.Height)
 	calories, err := spentenergy.WalkingSpentCalories(ds.Steps, ds.Personal.Weight, ds.Personal.Height, ds.Duration)
+
 	if err != nil {
 		return "", err
 	}
+
 	return fmt.Sprintf("Количество шагов: %d.\nДистанция составила %.2f км.\nВы сожгли %.2f ккал.\n",
 		ds.Steps, distance, calories), nil
 }

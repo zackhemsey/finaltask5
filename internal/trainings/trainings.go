@@ -47,7 +47,7 @@ func (t *Training) Parse(datastring string) error {
 		return fmt.Errorf("количество шагов должно быть положительным числом")
 	}
 	trainingType := strings.TrimSpace(parts[1])
-	// Accept any training type in Parse, validate in ActionInfo
+
 	durationStr := strings.TrimSpace(parts[2])
 	if durationStr == "" {
 		return fmt.Errorf("продолжительность не может быть пустой")
@@ -110,33 +110,27 @@ func parseDuration(s string) (time.Duration, error) {
 }
 
 func (t Training) ActionInfo() (string, error) {
-	if t.Steps <= 0 {
-		return "", fmt.Errorf("количество шагов должно быть положительным числом")
-	}
-	if t.Duration <= 0 {
-		return "", fmt.Errorf("продолжительность должна быть положительной")
-	}
-	if t.Personal.Weight <= 0 {
-		return "", fmt.Errorf("вес должен быть положительным числом")
-	}
-	if t.Personal.Height <= 0 {
-		return "", fmt.Errorf("рост должен быть положительным числом")
-	}
+
 	if t.TrainingType != "Ходьба" && t.TrainingType != "Бег" {
 		return "", fmt.Errorf("неизвестный тип тренировки")
 	}
+
 	distance := spentenergy.Distance(t.Steps, t.Personal.Height)
 	speed := spentenergy.MeanSpeed(t.Steps, t.Personal.Height, t.Duration)
+
 	var calories float64
 	var err error
+
 	if t.TrainingType == "Ходьба" {
 		calories, err = spentenergy.WalkingSpentCalories(t.Steps, t.Personal.Weight, t.Personal.Height, t.Duration)
 	} else {
 		calories, err = spentenergy.RunningSpentCalories(t.Steps, t.Personal.Weight, t.Personal.Height, t.Duration)
 	}
+
 	if err != nil {
 		return "", err
 	}
+
 	return fmt.Sprintf("Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f\n",
 		t.TrainingType, t.Duration.Hours(), distance, speed, calories), nil
 }
